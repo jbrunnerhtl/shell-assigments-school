@@ -1,5 +1,13 @@
 #!/bin/sh
-# Jan Brunner
+# Jan Brunner -- everything works
+
+countFiles () {
+	count=0
+	for i in $1.*; do
+		count=$(expr $count + 1)
+	done
+	echo $count
+}
 
 
 backupDir=backup
@@ -25,9 +33,24 @@ for i in *.sh *.txt; do
     newFileName=$backupDir"/"$i
     echo Zeit: $difference
     if test ! -e $newFileName || test $i -nt $newFileName; then
+    	
+    	if test $i -nt $newFileName; then
+    		count=$(countFiles "$newFileName")
+    		echo in
+    		fileNameWithoutExtension=$(echo "$i" | cut -d. -f1)
+    		diffFileName=$backupDir"/"$fileNameWithoutExtension".diff"
+    		touch $diffFileName
+    		echo "------  Version $count  ------" >> $diffFileName
+    		diff $i $newFileName >> $diffFileName
+    		
+    	fi
+    	
+    	
+    	
     	echo "--> "$i 
     	cp $i $newFileName
     	cp $i $newFileName"."$difference
+    	
     fi
 
 done
